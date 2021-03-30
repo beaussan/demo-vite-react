@@ -1,0 +1,74 @@
+- table:
+    schema: public
+    name: todo
+  object_relationships:
+  - name: user
+    using:
+      foreign_key_constraint_on: user_id
+  insert_permissions:
+  - role: user
+    permission:
+      check:
+        user:
+          id:
+            _eq: X-Hasura-User-Id
+      set:
+        user_id: x-hasura-User-Id
+      columns:
+      - id
+      - is_done
+      - title
+      backend_only: false
+  select_permissions:
+  - role: user
+    permission:
+      columns:
+      - id
+      - title
+      - is_done
+      - created_at
+      - updated_at
+      - user_id
+      filter:
+        user:
+          id:
+            _eq: X-Hasura-User-Id
+  update_permissions:
+  - role: user
+    permission:
+      columns:
+      - is_done
+      - title
+      filter:
+        user:
+          id:
+            _eq: X-Hasura-User-Id
+      check:
+        user:
+          id:
+            _eq: X-Hasura-User-Id
+- table:
+    schema: public
+    name: user
+  array_relationships:
+  - name: todos
+    using:
+      foreign_key_constraint_on:
+        column: user_id
+        table:
+          schema: public
+          name: todo
+  select_permissions:
+  - role: user
+    permission:
+      columns:
+      - id
+      - firebase_id
+      - display_name
+      - email
+      - photo_url
+      - created_at
+      - updated_at
+      filter:
+        id:
+          _eq: X-Hasura-User-Id
